@@ -40,21 +40,43 @@ game_window = {"top": top, "left": left, "width": width, "height": height}
 
 
 def processFrame(frame):
-    # first we are finding the accuracy meter on the bottom of the screen in a seperate image
-    # this is because the accuracy meter is always in the same position, and we want to harvest its data
-
-    # accuracy meter is 1/3 of the screen in the center, but only the bottom 1/15th of the screen
-    accuracyMeter = frame[int(frame.shape[0] * (13/14)):frame.shape[0],
-                          int(frame.shape[1] * (1/3)):int(frame.shape[1] * (2/3))]
-
     # change size to 960 x 540
     frame = cv2.resize(frame, (960, 540))
 
     processedImage = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # for now we are just turning it into greyscale and do some edge detection
     processedImage = cv2.Canny(processedImage, threshold1=200, threshold2=300)
-    meanValue = np.mean(processedImage)
-    return processedImage, meanValue
+    return processedImage
+
+
+def accuracyMeter(frame):
+    # accuracy meter is 1/3 of the screen in the center, but only the bottom 1/15th of the screen
+    accuracyImage = frame[int(frame.shape[0] * (13/14)):frame.shape[0],
+                          int(frame.shape[1] * (1/3)):int(frame.shape[1] * (2/3))]
+    # we will use the mean value of the accuracy meter to determine if the level has ended with the mean value(it should always be light)
+    meanValue = np.mean(accuracyImage)
+    # the primary objective of this function is to determine how accurate the ai is
+    # this is represented by a small white triangle on the accuracy meter, which moves left and right
+    # if it is in the center, it is 100% accurate, and the further from center in either direction, the worse
+
+    accuracyImage = cv2.cvtColor(accuracyImage, cv2.COLOR_BGR2GRAY)
+    # now we refine shape
+    kernel = np.ones((3, 3), np.uint8)
+    binary - cv2.erode(accuracyImage, kernel, iterations=1)
+    binary = cv2.dilate(binary, kernel, iterations=1)
+
+    # now we find the contours
+    contours, hierarchy = cv2.findContours(gray, 200, 255, cv2.THRESH_BINARY)
+    # we will use the largest contour as the accuracy indicator
+    # we will use the center of the contour as the position of the indicator
+    largestContour
+    for contour in contours:
+        # find the largest contour
+        if cv2.contourArea(contour) > cv2.contourArea(largestContour):
+            largestContour = cv2.contourArea(contour)
+            accuracyIndicator = contour
+    cv2.drawContours(accuracyImage, accuracyIndicator, -1, (255, 255, 255), 3)
+    return accuracyImage, meanValue
 
 
 def selectLevel():
@@ -89,12 +111,12 @@ def main():
             img = np.array(screenshot)
 
             # Process the frame
-            img, meanValue = processFrame(img)
+            img, meanValue = accuracyMeter(img)
 
             # print the mean value of the image
             print(meanValue)
             # if it is below 10, the level ended
-            if meanValue < 1.5:
+            if meanValue < 5:
                 print("Level ended")
                 # this is where we need to hand stuff outside of this program
                 selectLevel()
