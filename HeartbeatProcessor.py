@@ -1,9 +1,9 @@
 # this is a class that will be used to process and format data from the game ProjectHeartbeat
-#project heartbeat is a rhythm game, where the player must press the correct key at the correct time
-#the objective of this class is to simplify on screen data into a format that can be used by a neural network
+# project heartbeat is a rhythm game, where the player must press the correct key at the correct time
+# the objective of this class is to simplify on screen data into a format that can be used by a neural network
 
-#this class will first access the screen to grab frames from the game
-#next step is to process the frames to get the position
+# this class will first access the screen to grab frames from the game
+# next step is to process the frames to get the position
 
 
 import time
@@ -14,6 +14,7 @@ import pygetwindow as gw
 import pyautogui as ui
 import win32gui
 import vgamepad as vg
+import keyboard
 
 # Find the Project Heartbeat window by its title
 hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
@@ -22,12 +23,11 @@ win32gui.SetForegroundWindow(hb_window._hWnd)
 hb_window.activate()
 
 
-
 gamepad = vg.VX360Gamepad()
 
 # Move the Project Heartbeat window to the front
-#? not needed because sets foreground
-#hb_window.maximize()
+# ? not needed because sets foreground
+# hb_window.maximize()
 
 # Get the position and size of the Project Heartbeat window
 left, top, width, height = hb_window.left, hb_window.top, hb_window.width, hb_window.height
@@ -38,13 +38,15 @@ print("Window Size:", width, height)
 
 game_window = {"top": top, "left": left, "width": width, "height": height}
 
+
 def processFrame(frame):
     # first we are finding the accuracy meter on the bottom of the screen in a seperate image
     # this is because the accuracy meter is always in the same position, and we want to harvest its data
 
     # accuracy meter is 1/3 of the screen in the center, but only the bottom 1/15th of the screen
-    accuracyMeter = frame[int(frame.shape[0] * (13/14)):frame.shape[0], int(frame.shape[1] * (1/3)):int(frame.shape[1] * (2/3))]
-    
+    accuracyMeter = frame[int(frame.shape[0] * (13/14)):frame.shape[0],
+                          int(frame.shape[1] * (1/3)):int(frame.shape[1] * (2/3))]
+
     # change size to 960 x 540
     frame = cv2.resize(frame, (960, 540))
 
@@ -54,8 +56,10 @@ def processFrame(frame):
     meanValue = np.mean(processedImage)
     return processedImage, meanValue
 
+
 def selectLevel():
-    print("i dont know what you want me to do")
+    print("press a key to do shit")
+
     # this is where we need to hand stuff outside of this program i thin
     # for now we will manually have it exit and move onto the next level
     # right right enter down enter
@@ -65,13 +69,13 @@ def selectLevel():
     ui.press("down")
     ui.press("enter")
     print("level selected")
-    #await for level start
+    # await for level start
     time.sleep(1)
     ui.press("esc")
-    
+
 
 def main():
-    
+
     # doing some time management
     prevTime = time.time()
     with mss.mss() as sct:
@@ -79,7 +83,7 @@ def main():
             # Capture the game window
             screenshot = sct.grab(game_window)
 
-            #print("Capture screenshot")
+            # print("Capture screenshot")
 
             # Convert the screenshot to a NumPy array
             img = np.array(screenshot)
@@ -111,6 +115,8 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 print("Exited with q")
                 break
+
+
 main()
 
 # release all windows
