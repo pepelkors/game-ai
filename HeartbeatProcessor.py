@@ -26,7 +26,8 @@ hb_window.activate()
 gamepad = vg.VX360Gamepad()
 
 # Move the Project Heartbeat window to the front
-hb_window.maximize()
+#? not needed because sets foreground
+#hb_window.maximize()
 
 # Get the position and size of the Project Heartbeat window
 left, top, width, height = hb_window.left, hb_window.top, hb_window.width, hb_window.height
