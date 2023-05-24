@@ -53,30 +53,18 @@ def accuracyMeter(frame):
     # accuracy meter is 1/3 of the screen in the center, but only the bottom 1/15th of the screen
     accuracyImage = frame[int(frame.shape[0] * (13/14)):frame.shape[0],
                           int(frame.shape[1] * (1/3)):int(frame.shape[1] * (2/3))]
-    # we will use the mean value of the accuracy meter to determine if the level has ended with the mean value(it should always be light)
-    meanValue = np.mean(accuracyImage)
-    # the primary objective of this function is to determine how accurate the ai is
-    # this is represented by a small white triangle on the accuracy meter, which moves left and right
-    # if it is in the center, it is 100% accurate, and the further from center in either direction, the worse
-
+    # processing to only have white pixels exist in the image
     accuracyImage = cv2.cvtColor(accuracyImage, cv2.COLOR_BGR2GRAY)
-    # now we refine shape
-    kernel = np.ones((3, 3), np.uint8)
-    binary - cv2.erode(accuracyImage, kernel, iterations=1)
-    binary = cv2.dilate(binary, kernel, iterations=1)
+    # create an image with only white pixels
+    whitePixels = np.where(accuracyImage == 255)
 
-    # now we find the contours
-    contours, hierarchy = cv2.findContours(gray, 200, 255, cv2.THRESH_BINARY)
-    # we will use the largest contour as the accuracy indicator
-    # we will use the center of the contour as the position of the indicator
-    largestContour
-    for contour in contours:
-        # find the largest contour
-        if cv2.contourArea(contour) > cv2.contourArea(largestContour):
-            largestContour = cv2.contourArea(contour)
-            accuracyIndicator = contour
-    cv2.drawContours(accuracyImage, accuracyIndicator, -1, (255, 255, 255), 3)
-    return accuracyImage, meanValue
+    # find the x coordinate center of the white pixels
+    whitePixCenter = np.mean(whitePixels[1])
+
+    # now we need to find how far from the actual center the white pixels are
+    # 160 is the x center of the image, so we subtract the white pixel center from 160 and take abs value
+    distFromCenter = abs(160 - whitePixCenter)
+    return whitePixCenter, np.mean(accuracyImage)
 
 
 def selectLevel():
@@ -101,6 +89,7 @@ def main():
     # doing some time management
     prevTime = time.time()
     with mss.mss() as sct:
+        oldPixelCenter = 0
         while True:
             # Capture the game window
             screenshot = sct.grab(game_window)
@@ -111,12 +100,21 @@ def main():
             img = np.array(screenshot)
 
             # Process the frame
-            img, meanValue = accuracyMeter(img)
+            whitePixelCenter, meanValue = accuracyMeter(img)
+            # Calculate the change in white pixel center. if it moved towards zero, print "better"
+            deltaPixelCenter = whitePixelCenter - oldPixelCenter
+            if deltaPixelCenter < 0:
+                print("better")
+                print(deltaPixelCenter)
+            if deltaPixelCenter > 0:
+                print("worse")
+                print(deltaPixelCenter)
 
+            oldPixelCenter = whitePixelCenter
             # print the mean value of the image
-            print(meanValue)
+            # print(meanValue)
             # if it is below 10, the level ended
-            if meanValue < 5:
+            if meanValue <= 0:
                 print("Level ended")
                 # this is where we need to hand stuff outside of this program
                 selectLevel()
