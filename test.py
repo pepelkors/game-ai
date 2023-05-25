@@ -13,7 +13,7 @@ hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
 win32gui.SetForegroundWindow(hb_window._hWnd)
 # Activate the Project Heartbeat window
 hb_window.activate()
-hb_window.size = (960, 540)
+#hb_window.size = (960, 540)
 
 
 gamepad = vg.VX360Gamepad()
