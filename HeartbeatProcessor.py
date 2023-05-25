@@ -51,7 +51,7 @@ def processFrame(frame):
 
 def accuracyMeter(frame):
     # accuracy meter is 1/3 of the screen in the center, but only the bottom 1/15th of the screen
-    accuracyImage = frame[int(frame.shape[0] * (13/14)):frame.shape[0],
+    accuracyImage = frame[int(frame.shape[0] * (13/15)):frame.shape[0],
                           int(frame.shape[1] * (1/3)):int(frame.shape[1] * (2/3))]
     # processing to only have white pixels exist in the image
     accuracyImage = cv2.cvtColor(accuracyImage, cv2.COLOR_BGR2GRAY)
