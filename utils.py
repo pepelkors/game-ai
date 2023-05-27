@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #? from https://github.com/kevinhughes27/TensorKart/blob/master/utils.py
 #? kept the xbox controller code
-import sys
-import array
 
 from inputs import get_gamepad
 import math
@@ -14,7 +12,6 @@ class XboxController(object):
     MAX_JOY_VAL = math.pow(2, 15)
 
     def __init__(self):
-
         self.LeftJoystickY = 0
         self.LeftJoystickX = 0
         self.RightJoystickY = 0
