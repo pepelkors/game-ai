@@ -11,27 +11,19 @@ import cv2
 import mss
 import numpy as np
 import pygetwindow as gw
-import pyautogui as ui
 import win32gui
 import vgamepad as vg
+
 
 # Find the Project Heartbeat window by its title
 hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
 win32gui.SetForegroundWindow(hb_window._hWnd)
 # Activate the Project Heartbeat window
 hb_window.activate()
-
-#?maintian a 16 by 9 aspect ratio window
-tw = hb_window.width
-th = (tw/16)*9
-hb_window.size = (tw, th)
+#hb_window.size = (960, 540)
 
 
 gamepad = vg.VX360Gamepad()
-
-# Move the Project Heartbeat window to the front
-# ? not needed because sets foreground
-# hb_window.maximize()
 
 
 def edgeFrame(frame):
@@ -43,34 +35,15 @@ def edgeFrame(frame):
     meanValue = np.mean(frame)
     return processedImage, meanValue
 
-
 def accuracyFrame(frame):
-
     accuracyImage = frame[frame.shape[0]-23: frame.shape[0],
                           frame.shape[1]-612:frame.shape[1]-333]
     return accuracyImage
-
 
 def scoreFrame(frame):
     # the score is in the top right corner
     scoreImage = frame[20: 45, frame.shape[1]-180: frame.shape[1]-55]
     return scoreImage
-
-
-def selectLevel():
-    print("i dont know what you want me to do")
-    # this is where we need to hand stuff outside of this program i thin
-    # for now we will manually have it exit and move onto the next level
-    # right right enter down enter
-    ui.press("right")
-    ui.press("right")
-    ui.press("enter")
-    ui.press("down")
-    ui.press("enter")
-    print("level selected")
-    # await for level start
-    time.sleep(1)
-    ui.press("esc")
 
 
 def main():
