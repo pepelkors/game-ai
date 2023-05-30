@@ -4,3 +4,9 @@ venv
 get-pip.py
 # ignore vscode 
 .vscode
+
+#ignore python compile files
+__pycache__
+
+#ignore data files
+recordings

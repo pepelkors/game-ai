@@ -5,15 +5,18 @@
 # this class will first access the screen to grab frames from the game
 # next step is to process the frames to get the position
 
-
+import threading
+from utils import XboxController
 import time
 import cv2
 import mss
 import numpy as np
 import pygetwindow as gw
 import win32gui
-import vgamepad as vg
+import pickle as pickle
+import gzip
 
+import datetime 
 
 # Find the Project Heartbeat window by its title
 hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
@@ -21,9 +24,13 @@ win32gui.SetForegroundWindow(hb_window._hWnd)
 # Activate the Project Heartbeat window
 hb_window.activate()
 #hb_window.size = (960, 540)
+#?maintian a 16 by 9 aspect ratio window
+tw = hb_window.width
+th = (tw/16)*9
+hb_window.size = (tw, th)
 
 
-gamepad = vg.VX360Gamepad()
+gamepad = XboxController()
 
 
 def edgeFrame(frame):
@@ -45,13 +52,20 @@ def scoreFrame(frame):
     scoreImage = frame[20: 45, frame.shape[1]-180: frame.shape[1]-55]
     return scoreImage
 
+trainingData = []
+ss = []
+inputArr = []
 
 def main():
-
-    # doing some time management
-    prevTime = time.time()
+    prevTime = 0
     with mss.mss() as sct:
+        i = 0
         while True:
+            tempTime = round(time.time()*1000)
+            if((tempTime- prevTime) < 50 ):
+                time.sleep((tempTime- prevTime)/1000)
+            print(gamepad.read())
+            prevTime = tempTime
             # Get the position and size of the Project Heartbeat window
             game_window = {"top": hb_window.top+30, "left": hb_window.left +
                            8, "width": hb_window.width-16, "height": hb_window.height-38}
@@ -70,8 +84,12 @@ def main():
             cv2.imshow("Game Window", edges)
             cv2.imshow("accuracyMeter Window", accuracyMeter)
             cv2.imshow("scoreMeter Window", scoreMeter)
-            # Time management
-            prevTime = time.time()
+
+            inputs = gamepad.read()
+            
+            inputArr.append(inputs)
+            ss.append(edges)
+            
 
             # # press the "x" numpad with vgamepad
             # gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
@@ -83,10 +101,20 @@ def main():
             # Break the loop if 'q' key is pressed
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 print("Exited with q")
+                
+                threading.Thread(target=saveData, args=(ss, inputArr, i))
+                i+=1
+                
                 break
 
-
 main()
+
+def saveData(edges, inputArr, index):
+    start_time = datetime.datetime.now()
+    np.savez_compressed(f"./recordings/trainingData{str(index)}.npz", edges=edges, inputs=inputArr)
+    elapsed = datetime.datetime.now() - start_time
+    print(f"Numpy array saved in trainingData{str(index)}.npz in " + str(int(elapsed.total_seconds()*1000)) + " seconds")
+
 
 # release all windows
 cv2.destroyAllWindows()

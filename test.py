@@ -1,4 +1,4 @@
-import time
+
 import cv2
 import mss
 import numpy as np
@@ -6,7 +6,7 @@ import pygetwindow as gw
 import pyautogui as ui
 import win32gui
 import vgamepad as vg
-import keyboard
+
 
 # Find the Project Heartbeat window by its title
 hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]

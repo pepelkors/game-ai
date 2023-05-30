@@ -39,13 +39,20 @@ class XboxController(object):
 
     #TODO: set this to the shapes that are used in the game~
     def read(self):
-        x = self.LeftJoystickX
-        y = self.LeftJoystickY
-        a = self.A
-        b = self.X # b=1, x=2
-        rb = self.RightBumper
-        return [x, y, a, b, rb]
+        noteUp = self.Y #xbox Y button
+        noteDown = self.A #xbox A button
+        noteLeft = self.X # xbox X button
+        noteRight = self.B #xbox B button
+        slideLeft = 1 if self.LeftJoystickX < -0.6 else 0
+        slideRight = 1 if self.LeftJoystickX > 0.6 else 0
+        heartNote = 1 if (abs(self.LeftJoystickX) + abs(self.LeftJoystickY) + abs(self.RightJoystickX) + abs(self.RightJoystickY)) > 0.6 else 0
 
+        return [noteUp, noteDown, noteLeft, noteRight, slideLeft, slideRight, heartNote]
+
+    def dump(self):
+        if self.LeftJoystickY == 0 and self.LeftJoystickX == 0:
+            pass
+        return False
 
     def _monitor_controller(self):
         while True:
@@ -59,10 +66,13 @@ class XboxController(object):
                     self.RightJoystickY = event.state / XboxController.MAX_JOY_VAL # normalize between -1 and 1
                 elif event.code == 'ABS_RX':
                     self.RightJoystickX = event.state / XboxController.MAX_JOY_VAL # normalize between -1 and 1
+                    
                 elif event.code == 'ABS_Z':
-                    self.LeftTrigger = event.state / XboxController.MAX_TRIG_VAL # normalize between 0 and 1
+                    self.LeftTrigger = 1 if ((event.state / XboxController.MAX_TRIG_VAL)>0.6) else 0 # 0 or 1
                 elif event.code == 'ABS_RZ':
-                    self.RightTrigger = event.state / XboxController.MAX_TRIG_VAL # normalize between 0 and 1
+                    self.RightTrigger = 1 if ((event.state / XboxController.MAX_TRIG_VAL)>0.6) else 0 # 0 or 1
+                    
+                    
                 elif event.code == 'BTN_TL':
                     self.LeftBumper = event.state
                 elif event.code == 'BTN_TR':
@@ -70,9 +80,9 @@ class XboxController(object):
                 elif event.code == 'BTN_SOUTH':
                     self.A = event.state
                 elif event.code == 'BTN_NORTH':
-                    self.X = event.state
-                elif event.code == 'BTN_WEST':
                     self.Y = event.state
+                elif event.code == 'BTN_WEST':
+                    self.X = event.state
                 elif event.code == 'BTN_EAST':
                     self.B = event.state
                 elif event.code == 'BTN_THUMBL':
