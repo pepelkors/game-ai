@@ -7,11 +7,14 @@ import math
 import threading
 
 
+import datetime 
+
 class XboxController(object):
     MAX_TRIG_VAL = math.pow(2, 8)
     MAX_JOY_VAL = math.pow(2, 15)
 
     def __init__(self):
+        self.lastStart = datetime.datetime.now()
         self.LeftJoystickY = 0
         self.LeftJoystickX = 0
         self.RightJoystickY = 0
@@ -50,10 +53,13 @@ class XboxController(object):
         return [noteUp, noteDown, noteLeft, noteRight, slideLeft, slideRight, heartNote]
 
     def dump(self):
-        if self.LeftJoystickY == 0 and self.LeftJoystickX == 0:
-            pass
+        if self.LeftTrigger == 1 and self.RightTrigger == 1 and self.LeftBumper == 1 and self.RightBumper == 1:
+            elapsed = datetime.datetime.now() - self.lastStart
+            if(elapsed.total_seconds() > 2):
+                self.lastStart = datetime.datetime.now()
+                return True
         return False
-
+        
     def _monitor_controller(self):
         while True:
             events = get_gamepad()

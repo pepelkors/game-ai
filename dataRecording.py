@@ -13,8 +13,6 @@ import mss
 import numpy as np
 import pygetwindow as gw
 import win32gui
-import pickle as pickle
-import gzip
 
 import datetime 
 
@@ -52,11 +50,14 @@ def scoreFrame(frame):
     scoreImage = frame[20: 45, frame.shape[1]-180: frame.shape[1]-55]
     return scoreImage
 
-trainingData = []
+openThreads : list[threading.Thread]= [] 
 ss = []
 inputArr = []
+recording = False
+safe = True
 
 def main():
+    global recording, safe
     prevTime = 0
     with mss.mss() as sct:
         i = 0
@@ -64,32 +65,53 @@ def main():
             tempTime = round(time.time()*1000)
             if((tempTime- prevTime) < 50 ):
                 time.sleep((tempTime- prevTime)/1000)
-            print(gamepad.read())
+            
             prevTime = tempTime
             # Get the position and size of the Project Heartbeat window
             game_window = {"top": hb_window.top+30, "left": hb_window.left +
                            8, "width": hb_window.width-16, "height": hb_window.height-38}
             screenshot = sct.grab(game_window)
 
+
             # Convert the screenshot to a NumPy array
             img = np.array(screenshot)
             # shrink frame to 540 * 960 - 16*38
             img = cv2.resize(img, (944, 502))
             # Process the frame
+            
             edges, meanValue = edgeFrame(img)
             accuracyMeter = accuracyFrame(img)
             scoreMeter = scoreFrame(img)
-
-            # Display the game window
             cv2.imshow("Game Window", edges)
             cv2.imshow("accuracyMeter Window", accuracyMeter)
             cv2.imshow("scoreMeter Window", scoreMeter)
 
-            inputs = gamepad.read()
+
+
+            if(recording):
+                # Display the game window
+                inputs = gamepad.read()
+                inputArr.append(inputs)
+                ss.append(edges)
             
-            inputArr.append(inputs)
-            ss.append(edges)
-            
+            if(gamepad.dump()):
+                if(not recording):
+                    recording = True
+                    #clear arrays
+                    ss = []
+                    inputArr = []
+                    print("recording")
+                else:
+                    recording = False
+                    print("stopped recording")
+                    if(safe):
+                        safe = False
+                        temp  =threading.Thread(target=saveData, args=(ss, inputArr, i))
+                        temp.start()
+                        openThreads.append(temp)
+                        i+=1
+                    
+
 
             # # press the "x" numpad with vgamepad
             # gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
@@ -97,24 +119,24 @@ def main():
             # time.sleep(0.05)
             # gamepad.release_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
             # gamepad.update()
-
+            
             # Break the loop if 'q' key is pressed
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 print("Exited with q")
-                
-                threading.Thread(target=saveData, args=(ss, inputArr, i))
-                i+=1
-                
                 break
 
-main()
 
 def saveData(edges, inputArr, index):
+    global safe
     start_time = datetime.datetime.now()
     np.savez_compressed(f"./recordings/trainingData{str(index)}.npz", edges=edges, inputs=inputArr)
     elapsed = datetime.datetime.now() - start_time
-    print(f"Numpy array saved in trainingData{str(index)}.npz in " + str(int(elapsed.total_seconds()*1000)) + " seconds")
+    print(f"Numpy array saved in trainingData{str(index)}.npz in " + str(int(elapsed.total_seconds()*1000)) + "ms")
+    safe = True
 
 
+main()
+for thread in openThreads:
+    thread.join()
 # release all windows
 cv2.destroyAllWindows()
