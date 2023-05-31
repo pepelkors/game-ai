@@ -5,7 +5,7 @@ import cv2
 import mss
 import numpy as np
 import pygetwindow as gw
-import win32gui
+
 import os
 
 import datetime 

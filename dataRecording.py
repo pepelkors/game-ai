@@ -92,7 +92,7 @@ def main():
             # gamepad.update()
             
             # Break the loop if 'q' key is pressed
-            if cv2.waitKey(1) == ord("q"):
+            if cv2.waitKey(20) == ord("q"):
                 print("Exited with q")
                 break
 
