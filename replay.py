@@ -1,18 +1,9 @@
-import threading
 from utils import XboxController
-import time
 import cv2
-import mss
 import numpy as np
-import pygetwindow as gw
-
 import os
 
-import datetime 
-
-
 #read all the file names from the recordings folder
-
 recordings = os.listdir('recordings')
 gamepad = XboxController()
 
