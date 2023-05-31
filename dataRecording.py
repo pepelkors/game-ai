@@ -6,7 +6,7 @@
 # next step is to process the frames to get the position
 
 import threading
-from utils import XboxController
+from utils import *
 import time
 import cv2
 import mss
@@ -16,40 +16,10 @@ import win32gui
 
 import datetime 
 
-# Find the Project Heartbeat window by its title
-hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
-win32gui.SetForegroundWindow(hb_window._hWnd)
-# Activate the Project Heartbeat window
-hb_window.activate()
-#hb_window.size = (960, 540)
-#?maintian a 16 by 9 aspect ratio window
-tw = hb_window.width
-th = (tw/16)*9
-hb_window.size = (tw, th)
 
 
-gamepad = XboxController()
 
-
-def edgeFrame(frame):
-    # change size to 960 x 540
-    processedImage = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # for now we are just turning it into greyscale and do some edge detection
-    processedImage = cv2.Canny(processedImage, threshold1=200, threshold2=300)
-
-    meanValue = np.mean(frame)
-    return processedImage, meanValue
-
-def accuracyFrame(frame):
-    accuracyImage = frame[frame.shape[0]-23: frame.shape[0],
-                          frame.shape[1]-612:frame.shape[1]-333]
-    return accuracyImage
-
-def scoreFrame(frame):
-    # the score is in the top right corner
-    scoreImage = frame[20: 45, frame.shape[1]-180: frame.shape[1]-55]
-    return scoreImage
-
+xboxController = XboxController()
 openThreads : list[threading.Thread]= [] 
 ss = []
 inputArr = []
@@ -90,11 +60,13 @@ def main():
 
             if(recording):
                 # Display the game window
-                inputs = gamepad.read()
+                inputs = xboxController.read()
                 inputArr.append(inputs)
                 ss.append(edges)
             
-            if(gamepad.dump()):
+            
+            
+            if(xboxController.dump()):
                 if(not recording):
                     recording = True
                     #clear arrays
@@ -112,7 +84,6 @@ def main():
                         i+=1
                     
 
-
             # # press the "x" numpad with vgamepad
             # gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
             # gamepad.update()
@@ -121,7 +92,7 @@ def main():
             # gamepad.update()
             
             # Break the loop if 'q' key is pressed
-            if cv2.waitKey(1) & 0xFF == ord("q"):
+            if cv2.waitKey(1) == ord("q"):
                 print("Exited with q")
                 break
 
@@ -134,9 +105,21 @@ def saveData(edges, inputArr, index):
     print(f"Numpy array saved in trainingData{str(index)}.npz in " + str(int(elapsed.total_seconds()*1000)) + "ms")
     safe = True
 
-
-main()
-for thread in openThreads:
-    thread.join()
-# release all windows
-cv2.destroyAllWindows()
+if(__name__ == "__main__"):
+    # Find the Project Heartbeat window by its title
+    hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
+    win32gui.SetForegroundWindow(hb_window._hWnd)
+    # Activate the Project Heartbeat window
+    hb_window.activate()
+    #hb_window.size = (960, 540)
+    #?maintian a 16 by 9 aspect ratio window
+    tw = hb_window.width
+    th = (tw/16)*9
+    hb_window.size = (tw, th)
+    
+    #run main loop
+    main()
+    for thread in openThreads:
+        thread.join()
+    # release all windows
+    cv2.destroyAllWindows()

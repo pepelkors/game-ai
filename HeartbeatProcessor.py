@@ -13,48 +13,13 @@ import numpy as np
 import pygetwindow as gw
 import pyautogui as ui
 import win32gui
-import vgamepad as vg
+from utils import *
 
-# Find the Project Heartbeat window by its title
-hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
-win32gui.SetForegroundWindow(hb_window._hWnd)
-# Activate the Project Heartbeat window
-hb_window.activate()
-
-#?maintian a 16 by 9 aspect ratio window
-tw = hb_window.width
-th = (tw/16)*9
-hb_window.size = (tw, th)
-
-
-gamepad = vg.VX360Gamepad()
+#gamepad = 
 
 # Move the Project Heartbeat window to the front
 # ? not needed because sets foreground
 # hb_window.maximize()
-
-
-def edgeFrame(frame):
-    # change size to 960 x 540
-    processedImage = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # for now we are just turning it into greyscale and do some edge detection
-    processedImage = cv2.Canny(processedImage, threshold1=200, threshold2=300)
-
-    meanValue = np.mean(frame)
-    return processedImage, meanValue
-
-
-def accuracyFrame(frame):
-
-    accuracyImage = frame[frame.shape[0]-23: frame.shape[0],
-                          frame.shape[1]-612:frame.shape[1]-333]
-    return accuracyImage
-
-
-def scoreFrame(frame):
-    # the score is in the top right corner
-    scoreImage = frame[20: 45, frame.shape[1]-180: frame.shape[1]-55]
-    return scoreImage
 
 
 def selectLevel():
@@ -113,7 +78,19 @@ def main():
                 break
 
 
-main()
-
-# release all windows
-cv2.destroyAllWindows()
+if(__name__ == "__main__"):
+    # Find the Project Heartbeat window by its title
+    hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
+    win32gui.SetForegroundWindow(hb_window._hWnd)
+    # Activate the Project Heartbeat window
+    hb_window.activate()
+    #hb_window.size = (960, 540)
+    #?maintian a 16 by 9 aspect ratio window
+    tw = hb_window.width
+    th = (tw/16)*9
+    hb_window.size = (tw, th)
+    
+    #run main loop
+    main()
+    # release all windows
+    cv2.destroyAllWindows()

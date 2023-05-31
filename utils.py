@@ -2,10 +2,13 @@
 #? from https://github.com/kevinhughes27/TensorKart/blob/master/utils.py
 #? kept the xbox controller code
 
+import vgamepad as vg
+
 from inputs import get_gamepad
 import math
 import threading
-
+import cv2
+import numpy as np
 
 import datetime 
 
@@ -42,6 +45,11 @@ class XboxController(object):
 
     #TODO: set this to the shapes that are used in the game~
     def read(self):
+        '''
+        returns a list of the buttons that are pressed
+        returns Y A X B ThumbStickLeft ThumbStickRight ThumbStick
+        '''
+        
         noteUp = self.Y #xbox Y button
         noteDown = self.A #xbox A button
         noteLeft = self.X # xbox X button
@@ -49,7 +57,7 @@ class XboxController(object):
         slideLeft = 1 if self.LeftJoystickX < -0.6 else 0
         slideRight = 1 if self.LeftJoystickX > 0.6 else 0
         heartNote = 1 if (abs(self.LeftJoystickX) + abs(self.LeftJoystickY) + abs(self.RightJoystickX) + abs(self.RightJoystickY)) > 0.6 else 0
-
+        
         return [noteUp, noteDown, noteLeft, noteRight, slideLeft, slideRight, heartNote]
 
     def dump(self):
@@ -107,3 +115,72 @@ class XboxController(object):
                     self.UpDPad = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY4':
                     self.DownDPad = event.state
+
+
+def edgeFrame(frame):
+    # change size to 960 x 540
+    processedImage = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # for now we are just turning it into greyscale and do some edge detection
+    processedImage = cv2.Canny(processedImage, threshold1=200, threshold2=300)
+
+    meanValue = np.mean(frame)
+    return processedImage, meanValue
+
+def accuracyFrame(frame):
+    accuracyImage = frame[frame.shape[0]-23: frame.shape[0],
+                          frame.shape[1]-612:frame.shape[1]-333]
+    return accuracyImage
+
+def scoreFrame(frame):
+    # the score is in the top right corner
+    scoreImage = frame[20: 45, frame.shape[1]-180: frame.shape[1]-55]
+    return scoreImage
+
+class GamePad(object):
+    def __init__(self):
+        self.state = [0,0,0,0,0,0,0]
+        self.vg = vg.VX360Gamepad()
+        pass
+    def update(self, state):
+        self.state = state
+        
+        #get the first 4 buttons from the state
+        stateButtons = state[0:4]
+        buttons = [vg.XUSB_BUTTON.XUSB_GAMEPAD_Y, vg.XUSB_BUTTON.XUSB_GAMEPAD_A,vg.XUSB_BUTTON.XUSB_GAMEPAD_X, vg.XUSB_BUTTON.XUSB_GAMEPAD_B]
+        
+        for i, j in zip(buttons, stateButtons):
+            self.vg.press_button(i, j)
+        
+        #left slide
+        if(state[4] == 1):
+            self.vg.left_joystick_float(-1)
+        else:
+            self.vg.left_joystick_float(0)
+        
+        #right slide and heart note
+        if(state[5] == 1 or state[6] == 1):
+            self.vg.right_joystick_float(1)
+        else:
+            self.vg.right_joystick_float(0)
+        
+        #push changes
+        self.vg.update()
+        
+    
+    def reset(self):
+        self.state = [0,0,0,0,0,0,0]
+        
+        #get the first 4 buttons from the state
+        stateButtons = self.state[0:4]
+        buttons = [vg.XUSB_BUTTON.XUSB_GAMEPAD_Y, vg.XUSB_BUTTON.XUSB_GAMEPAD_A,vg.XUSB_BUTTON.XUSB_GAMEPAD_X, vg.XUSB_BUTTON.XUSB_GAMEPAD_B]
+        
+        for i, j in zip(buttons, stateButtons):
+            self.vg.press_button(i, j)
+        
+        
+        self.vg.left_joystick_float(0)
+        self.vg.right_joystick_float(0)
+        self.vg.update()
+        
+    def read(self):
+        return self.state
