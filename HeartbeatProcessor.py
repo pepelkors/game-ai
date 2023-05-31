@@ -38,13 +38,6 @@ def main():
             averageX = whitePixelCenter(accuracyMeter)
             # round averagex and previousX to 2 decimal places
             deltaPixelCenter = averageX - previousX
-            if deltaPixelCenter < 0:
-                print("better")
-                print(deltaPixelCenter)
-            if deltaPixelCenter > 0:
-                print("worse")
-                print(deltaPixelCenter)
-
             previousX = averageX
             scoreMeter = scoreFrame(img)
 
@@ -54,13 +47,6 @@ def main():
             cv2.imshow("scoreMeter Window", scoreMeter)
             # Time management
             prevTime = time.time()
-
-            # # press the "x" numpad with vgamepad
-            # gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
-            # gamepad.update()
-            # time.sleep(0.05)
-            # gamepad.release_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
-            # gamepad.update()
 
             # Break the loop if 'q' key is pressed
             if cv2.waitKey(1) & 0xFF == ord("q"):

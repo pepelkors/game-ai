@@ -147,12 +147,12 @@ def whitePixelCenter(frame):
     frame = cv2.bitwise_and(frame, frame, mask=binary)
 
     whitePixels = np.where(frame == 255)
-    whitePixCenter = np.mean(whitePixels[1])
-
-    # now we need to find how far from the actual center the white pixels are
-    # 160 is the x center of the image, so we subtract the white pixel center from 160 and take abs value
-    distFromCenter = abs(472 - whitePixCenter)
-    return whitePixCenter
+    if (len(whitePixels[0]) != 0):
+        whitePixCenter = np.mean(whitePixels[1])
+        distFromCenter = abs(472 - whitePixCenter)
+        return distFromCenter
+    else:
+        return -1
 
 
 def rewardCalculator(averageX, previousX):
