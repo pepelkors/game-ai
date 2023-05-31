@@ -15,34 +15,13 @@ import pyautogui as ui
 import win32gui
 from utils import *
 
-#gamepad = 
-
-# Move the Project Heartbeat window to the front
-# ? not needed because sets foreground
-# hb_window.maximize()
-
-
-def selectLevel():
-    print("i dont know what you want me to do")
-    # this is where we need to hand stuff outside of this program i thin
-    # for now we will manually have it exit and move onto the next level
-    # right right enter down enter
-    ui.press("right")
-    ui.press("right")
-    ui.press("enter")
-    ui.press("down")
-    ui.press("enter")
-    print("level selected")
-    # await for level start
-    time.sleep(1)
-    ui.press("esc")
-
 
 def main():
 
     # doing some time management
     prevTime = time.time()
     with mss.mss() as sct:
+        previousX = 0
         while True:
             # Get the position and size of the Project Heartbeat window
             game_window = {"top": hb_window.top+30, "left": hb_window.left +
@@ -56,6 +35,17 @@ def main():
             # Process the frame
             edges, meanValue = edgeFrame(img)
             accuracyMeter = accuracyFrame(img)
+            averageX = whitePixelCenter(accuracyMeter)
+            # round averagex and previousX to 2 decimal places
+            deltaPixelCenter = averageX - previousX
+            if deltaPixelCenter < 0:
+                print("better")
+                print(deltaPixelCenter)
+            if deltaPixelCenter > 0:
+                print("worse")
+                print(deltaPixelCenter)
+
+            previousX = averageX
             scoreMeter = scoreFrame(img)
 
             # Display the game window
@@ -78,19 +68,19 @@ def main():
                 break
 
 
-if(__name__ == "__main__"):
+if (__name__ == "__main__"):
     # Find the Project Heartbeat window by its title
     hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
     win32gui.SetForegroundWindow(hb_window._hWnd)
     # Activate the Project Heartbeat window
     hb_window.activate()
-    #hb_window.size = (960, 540)
-    #?maintian a 16 by 9 aspect ratio window
+    # hb_window.size = (960, 540)
+    # ?maintian a 16 by 9 aspect ratio window
     tw = hb_window.width
     th = (tw/16)*9
     hb_window.size = (tw, th)
-    
-    #run main loop
+
+    # run main loop
     main()
     # release all windows
     cv2.destroyAllWindows()
