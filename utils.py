@@ -60,8 +60,8 @@ class XboxController(object):
         slideRight = 1 if self.LeftJoystickX > 0.6 else 0
         heartNote = 1 if (abs(self.LeftJoystickX) + abs(self.LeftJoystickY) +
                           abs(self.RightJoystickX) + abs(self.RightJoystickY)) > 0.6 else 0
-
-        return [noteUp, noteDown, noteLeft, noteRight, slideLeft, slideRight, heartNote]
+        dpadLeft, dpadRight, dpadUp, dpadDown = self.LeftDPad, self.RightDPad, self.UpDPad, self.DownDPad
+        return [noteUp, noteDown, noteLeft, noteRight, slideLeft, slideRight, heartNote, dpadLeft, dpadRight, dpadUp, dpadDown]
 
     def dump(self):
         if self.LeftTrigger == 1 and self.RightTrigger == 1 and self.LeftBumper == 1 and self.RightBumper == 1:

@@ -20,7 +20,7 @@ for i in recordings:
         currentFrame = edges[j]
         currentInputs = inputs[j]
         currentFrame = cv2.cvtColor(currentFrame, cv2.COLOR_BGR2RGB)
-        colors = [(0,255,255), (0,255,0), (255,0,0), (0,0,255), (128,0,255), (128,0,255), (255,0,255)]
+        colors = [(0,255,255), (0,255,0), (255,0,0), (0,0,255), (128,0,255), (128,0,255), (255,0,255), (255,255,0), (255,255,0),(255,255,0), (255,255,0)]
         for k in range(len(currentInputs)):
             if currentInputs[k] == 1:
                 size = 32
