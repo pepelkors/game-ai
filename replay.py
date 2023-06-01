@@ -15,9 +15,14 @@ for i in recordings:
     raw = np.load(f'recordings/{i}')
     edges = raw['edges']
     print(len(edges))
+    
     inputs = raw['inputs']
+    
+    print(np.shape(edges))
+    
     for j in range(len(edges)):
         currentFrame = edges[j]
+        # print(np.shape(currentFrame))
         currentInputs = inputs[j]
         currentFrame = cv2.cvtColor(currentFrame, cv2.COLOR_BGR2RGB)
         colors = [(0,255,255), (0,255,0), (255,0,0), (0,0,255), (128,0,255), (128,0,255), (255,0,255), (255,255,0), (255,255,0),(255,255,0), (255,255,0)]
