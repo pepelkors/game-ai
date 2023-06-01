@@ -1,25 +1,26 @@
 import tensorflow as tf
 from tensorflow import keras
 from keras import layers
-from utils import XboxController
 import cv2
 import numpy as np
 import os
 
 # read all the file names from the recordings folder
 recordings = os.listdir('recordings')
-gamepad = XboxController()
 
 recordings.sort()
 allSC = []
 inp = []
-for i in recordings[1:]:
-    print(i)
-    # read the recordings
-    raw = np.load(f'recordings/{i}')
-    allSC = np.append(raw['edges'], allSC)
-    inp = np.append(raw['inputs'], inp)
-    del (raw)
+raw = np.load(f'recordings/{recordings[0]}')
+allSC = np.append(raw['edges'], allSC)
+inp = np.append(raw['inputs'], inp)
+# for i in recordings[1:]:
+#     print(i)
+#     # read the recordings
+#     raw = np.load(f'recordings/{i}')
+#     allSC = np.append(raw['edges'], all5SC)
+#     inp = np.append(raw['inputs'], inp)
+#     del (raw)
 
 
 # Define the CNN model

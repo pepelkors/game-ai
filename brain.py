@@ -11,5 +11,3 @@ try:
 except:
     print("That model does not exist")
     exit()
-
-# we need to take heartbeat processor frames and return inputs to use
