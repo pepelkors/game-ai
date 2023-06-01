@@ -1,24 +1,19 @@
 import tensorflow as tf
 from tensorflow import keras
 from keras import layers
-import cv2
+from sklearn.model_selection import train_test_split
 import numpy as np
 import os
 
 # read all the file names from the recordings folder
 recordings = os.listdir('recordings')
 
-recordings.sort()
-allSC = []
-inp = []
-raw = np.load(f'recordings/{recordings[0]}')
-allSC = np.append(raw['edges'], allSC)
-inp = np.append(raw['inputs'], inp)
+
 # for i in recordings[1:]:
 #     print(i)
 #     # read the recordings
-#     raw = np.load(f'recordings/{i}')
-#     allSC = np.append(raw['edges'], all5SC)
+#
+#     allSC = np.append(raw['edges'], allSC)
 #     inp = np.append(raw['inputs'], inp)
 #     del (raw)
 
@@ -26,37 +21,37 @@ inp = np.append(raw['inputs'], inp)
 # Define the CNN model
 model = keras.Sequential()
 
-# Add Convolutional layers
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(502, 944, 1)))
-model.add(layers.MaxPooling2D((2, 2)))
+model = keras.Sequential([
+    layers.Conv2D(32, kernel_size=(3, 3), activation='relu',
+                  input_shape=(502, 944, 1)),
+    layers.MaxPooling2D(pool_size=(2, 2)),
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    # Assuming you want 8 outputs with sigmoid activation
+    layers.Dense(7, activation='sigmoid')
+])
 
-# Add more Convolutional layers as needed
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-model.add(layers.MaxPooling2D((2, 2)))
-
-# Flatten layer
-model.add(layers.Flatten())
-
-# Add Dense layers
-model.add(layers.Dense(128, activation='relu'))
-
-# Output layer
-model.add(layers.Dense(8, activation='softmax'))
-
-# Compile the model
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
-validate = np.load(f'recordings/{recordings[0]}')
-model.fit(allSC, inp, epochs=10, batch_size=32,
-          validation_data=(validate["edges"], validate["inputs"]))
-
-train_dataset = tf.data.Dataset.from_tensor_slices((train_data, train_labels))
-test_dataset = tf.data.Dataset.from_tensor_slices((test_data, test_labels))
 
 
-# save model to the saved model folder
-# ask the user what they would like to name the model, and save it in models folder
-model.save(f'models/{input("What would you like to name the model?")}.h5')
+for i in range(len(recordings)):
+    raw = np.load(f'recordings/{recordings[i]}')
+    frames = raw['edges']
+    inp = raw['inputs']
+    print(np.shape(inp))
+    frames = frames.astype('float32') / 255.0  # Normalize pixel values
+    # Reshape to (samples, height, width, channels)
+    frames = np.reshape(frames, (frames.shape[0], 502, 944, 1))
+    buttons_encoded = inp
+    frames_train, frames_val, buttons_train, buttons_val = train_test_split(
+        frames, buttons_encoded, test_size=0.2)
+    print(np.shape(frames_train))
+    print(np.shape(buttons_train))
+    model.fit(frames_train, buttons_train, batch_size=32,
+              epochs=10, validation_data=(frames_val, buttons_val))
+    model.save(f'models/{i}.h5')
+
 
 # Print the model summary
 model.summary()
