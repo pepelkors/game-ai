@@ -24,7 +24,7 @@ model = keras.Sequential()
 model = keras.Sequential([
     layers.Conv2D(32, kernel_size=(4, 4), activation='relu',
                   input_shape=(144, 256, 1)),
-    layers.MaxPooling2D(pool_size=(8, 8)),
+    layers.MaxPooling2D(pool_size=(2,2)),
     layers.Flatten(),
     layers.Dense(48, activation='relu'),
     # Assuming you want 11 outputs with sigmoid activation
