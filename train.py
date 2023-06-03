@@ -22,13 +22,13 @@ recordings = os.listdir('recordings')
 model = keras.Sequential()
 
 model = keras.Sequential([
-    layers.Conv2D(32, kernel_size=(3, 3), activation='relu',
-                  input_shape=(502, 944, 1)),
-    layers.MaxPooling2D(pool_size=(2, 2)),
+    layers.Conv2D(32, kernel_size=(4, 4), activation='relu',
+                  input_shape=(144, 256, 1)),
+    layers.MaxPooling2D(pool_size=(8, 8)),
     layers.Flatten(),
-    layers.Dense(64, activation='relu'),
-    # Assuming you want 8 outputs with sigmoid activation
-    layers.Dense(7, activation='sigmoid')
+    layers.Dense(48, activation='relu'),
+    # Assuming you want 11 outputs with sigmoid activation
+    layers.Dense(11, activation='sigmoid')
 ])
 
 model.compile(optimizer='adam', loss='categorical_crossentropy',
@@ -42,7 +42,7 @@ for i in range(len(recordings)):
     print(np.shape(inp))
     frames = frames.astype('float32') / 255.0  # Normalize pixel values
     # Reshape to (samples, height, width, channels)
-    frames = np.reshape(frames, (frames.shape[0], 502, 944, 1))
+    frames = np.reshape(frames, (frames.shape[0], 144, 256, 1))
     buttons_encoded = inp
     frames_train, frames_val, buttons_train, buttons_val = train_test_split(
         frames, buttons_encoded, test_size=0.2)

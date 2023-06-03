@@ -31,7 +31,7 @@ def main():
             # Convert the screenshot to a NumPy array
             img = np.array(screenshot)
             # shrink frame to 540 * 960 - 16*38
-            img = cv2.resize(img, (944, 502))
+            img = cv2.resize(img, (256, 144))
             # Process the frame
             edges, meanValue = edgeFrame(img)
             accuracyMeter = accuracyFrame(img)

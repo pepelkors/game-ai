@@ -49,7 +49,7 @@ class XboxController(object):
     def read(self):
         '''
         returns a list of the buttons that are pressed
-        returns Y A X B ThumbStickLeft ThumbStickRight ThumbStick
+        returns Y A X B ThumbStickLeft ThumbStickRight ThumbStick LeftDPad RightDPad UpDPad DownDPad
         '''
 
         noteUp = self.Y  # xbox Y button
