@@ -53,8 +53,15 @@ def main():
             scoreMeter = scoreFrame(img)
 
             # get the inputs from the model
-            inputs = performInference(edges)
-            # now to actually do something with them
+            print(np.shape(edges))
+            aiFrame = edges.astype('float32') / 255.0  # Normalize pixel values
+            # Reshape to (samples, height, width, channels)
+            aiFrame = np.reshape(aiFrame, (1, 144, 256, 1))
+            inputs = performInference(aiFrame)
+            # gamepad has an all in one update func
+
+            print(inputs)
+            # GamePad.update(inputs)
 
             # Display the game window
             cv2.imshow("Game Window", edges)
@@ -71,7 +78,7 @@ def main():
 
 if (__name__ == "__main__"):
     # load the model
-    model = load_model('models/bwaa.h5')
+    model = load_model('models/0.h5')
     print("model loaded")
     # Find the Project Heartbeat window by its title
     hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
@@ -84,6 +91,8 @@ if (__name__ == "__main__"):
     th = (tw/16)*9
     hb_window.size = (tw, th)
     prevTime = time.time()
+    # instanciate a gamepad
+    GamePad = GamePad()
 
     # run main loop
     main()
