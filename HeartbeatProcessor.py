@@ -54,7 +54,8 @@ def main():
 
             # get the inputs from the model
             inputs = performInference(edges)
-            # now to actually do something with them
+            # gamepad has an all in one update func
+            GamePad.update(inputs)
 
             # Display the game window
             cv2.imshow("Game Window", edges)
@@ -84,6 +85,8 @@ if (__name__ == "__main__"):
     th = (tw/16)*9
     hb_window.size = (tw, th)
     prevTime = time.time()
+    # instanciate a gamepad
+    GamePad = GamePad()
 
     # run main loop
     main()
