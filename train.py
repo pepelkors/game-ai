@@ -20,7 +20,8 @@ recordings = os.listdir('recordings')
 
 # Define the CNN model
 model = keras.Sequential([
-    layers.Conv2D(32, kernel_size=(4, 4), activation='sigmoid', input_shape=(144, 256, 1)),
+    layers.Conv2D(32, kernel_size=(4, 4), activation='sigmoid',
+                  input_shape=(144, 256, 1)),
     layers.MaxPooling2D(pool_size=(2, 2)),
     layers.Flatten(),
     layers.Dense(256, activation='sigmoid'),
@@ -28,20 +29,23 @@ model = keras.Sequential([
     layers.Dense(11, activation='relu')
 ])
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='categorical_crossentropy',
+              metrics=['accuracy'])
 
 for i in range(len(recordings)):
     raw = np.load(f'recordings/{recordings[i]}')
     frames = raw['edges']
     inp = raw['inputs']
+
     print(np.shape(inp))
     frames = frames.astype('float32') / 255.0  # Normalize pixel values
     frames = np.reshape(frames, (frames.shape[0], 144, 256, 1))
-    
+
     buttons_encoded = inp
 
     # Use validation_split argument for automatic data split
-    model.fit(frames, buttons_encoded, batch_size=32, epochs=10, validation_split=0.2 )
+    model.fit(frames, buttons_encoded, batch_size=32,
+              epochs=10, validation_split=0.2)
 
     model.save(f'models/{i}.h5')
 

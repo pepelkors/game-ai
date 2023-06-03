@@ -1,13 +1,11 @@
-# this is where the ai actually plays games and learns?
+# this file takes in recording files, and removes the frames that do not have any inputs associated
 
-from tensorflow.keras.models import load_model
+# get just one recording, start with 0
+
+import os
 import numpy as np
 
-# load the trained model from the models folder
-# ask the user for the name of the model they want to use
-try:
-    model = load_model(
-        f'models/{input("What model would you like to use?")}.h5')
-except:
-    print("That model does not exist")
-    exit()
+recordings = os.listdir('recordings')
+recording = np.load(f'recordings/{recordings[0]}')
+
+# now to iterate through the recording and remove the frames that have an input set that sums to 0
