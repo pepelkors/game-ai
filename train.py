@@ -20,14 +20,19 @@ recordings = os.listdir('recordings')
 
 # Define the CNN model
 model = keras.Sequential([
-    layers.Conv2D(32, kernel_size=(4, 4), activation='sigmoid',
-                  input_shape=(144, 256, 1)),
-    layers.MaxPooling2D(pool_size=(2, 2)),
-    layers.Flatten(),
-    layers.Dense(256, activation='sigmoid'),
-    layers.Dense(64, activation='sigmoid'),
-    layers.Dense(11, activation='relu')
-])
+        layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(144, 256, 1)),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(128, kernel_size=(3, 3), activation='relu'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Flatten(),
+        layers.Dense(256, activation='relu'),
+        layers.Dropout(0.5),
+        layers.Dense(11, activation='sigmoid')
+    ])
+
+
 
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
@@ -48,10 +53,6 @@ for i in range(len(recordings)):
               epochs=10, validation_split=0.2)
 
     model.save(f'models/{i}.h5')
-
-# Print the model summary
-model.summary()
-
 
 # Print the model summary
 model.summary()
