@@ -14,12 +14,23 @@ import pygetwindow as gw
 import pyautogui as ui
 import win32gui
 from utils import *
+import tensorflow as tf
+from tensorflow import keras
+from keras.models import load_model
+
+# this function will take in a frame and return what inputs are needed to be pressed
+# this is the main function that will be used to process the frames
+
+
+def performInference(frame):
+    prediction = model.predict(frame)
+    return prediction
 
 
 def main():
 
     # doing some time management
-    prevTime = time.time()
+
     with mss.mss() as sct:
         previousX = 0
         while True:
@@ -41,6 +52,10 @@ def main():
             previousX = averageX
             scoreMeter = scoreFrame(img)
 
+            # get the inputs from the model
+            inputs = performInference(edges)
+            # now to actually do something with them
+
             # Display the game window
             cv2.imshow("Game Window", edges)
             cv2.imshow("accuracyMeter Window", accuracyMeter)
@@ -55,6 +70,9 @@ def main():
 
 
 if (__name__ == "__main__"):
+    # load the model
+    model = load_model('models/bwaa.h5')
+    print("model loaded")
     # Find the Project Heartbeat window by its title
     hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
     win32gui.SetForegroundWindow(hb_window._hWnd)
@@ -65,6 +83,7 @@ if (__name__ == "__main__"):
     tw = hb_window.width
     th = (tw/16)*9
     hb_window.size = (tw, th)
+    prevTime = time.time()
 
     # run main loop
     main()
