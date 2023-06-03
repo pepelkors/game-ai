@@ -19,21 +19,16 @@ recordings = os.listdir('recordings')
 
 
 # Define the CNN model
-model = keras.Sequential()
-
 model = keras.Sequential([
-    layers.Conv2D(32, kernel_size=(4, 4), activation='relu',
-                  input_shape=(144, 256, 1)),
-    layers.MaxPooling2D(pool_size=(2,2)),
+    layers.Conv2D(32, kernel_size=(4, 4), activation='sigmoid', input_shape=(144, 256, 1)),
+    layers.MaxPooling2D(pool_size=(2, 2)),
     layers.Flatten(),
-    layers.Dense(48, activation='relu'),
-    # Assuming you want 11 outputs with sigmoid activation
-    layers.Dense(11, activation='sigmoid')
+    layers.Dense(256, activation='sigmoid'),
+    layers.Dense(64, activation='sigmoid'),
+    layers.Dense(11, activation='relu')
 ])
 
-model.compile(optimizer='adam', loss='categorical_crossentropy',
-              metrics=['accuracy'])
-
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 for i in range(len(recordings)):
     raw = np.load(f'recordings/{recordings[i]}')
@@ -41,16 +36,17 @@ for i in range(len(recordings)):
     inp = raw['inputs']
     print(np.shape(inp))
     frames = frames.astype('float32') / 255.0  # Normalize pixel values
-    # Reshape to (samples, height, width, channels)
     frames = np.reshape(frames, (frames.shape[0], 144, 256, 1))
+    
     buttons_encoded = inp
-    frames_train, frames_val, buttons_train, buttons_val = train_test_split(
-        frames, buttons_encoded, test_size=0.2)
-    print(np.shape(frames_train))
-    print(np.shape(buttons_train))
-    model.fit(frames_train, buttons_train, batch_size=32,
-              epochs=10, validation_data=(frames_val, buttons_val))
+
+    # Use validation_split argument for automatic data split
+    model.fit(frames, buttons_encoded, batch_size=32, epochs=10, validation_split=0.2 )
+
     model.save(f'models/{i}.h5')
+
+# Print the model summary
+model.summary()
 
 
 # Print the model summary
