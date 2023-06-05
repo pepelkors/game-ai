@@ -17,21 +17,26 @@ recordings = os.listdir('recordings')
 #     inp = np.append(raw['inputs'], inp)
 #     del (raw)
 
-
+input_shape = (144, 256, 1)
 # Define the CNN model
-model = keras.Sequential([
-        layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(144, 256, 1)),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(128, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Flatten(),
-        layers.Dense(256, activation='relu'),
-        layers.Dropout(0.5),
-        layers.Dense(11, activation='sigmoid')
-    ])
+model = keras.Sequential()
+# Add convolutional layers
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
+model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
+# Flatten the output of the convolutional layers
+model.add(layers.Flatten())
+
+# Add LSTM layers
+model.add(layers.Reshape((256, 240)))  # Reshape to match LSTM input shape
+model.add(layers.LSTM(64, return_sequences=True))
+model.add(layers.LSTM(64))
+
+model.add(layers.Dense(11, activation='sigmoid'))
 
 
 model.compile(optimizer='adam', loss='categorical_crossentropy',
@@ -56,3 +61,4 @@ for i in range(len(recordings)):
 
 # Print the model summary
 model.summary()
+

@@ -77,15 +77,6 @@ def main():
                         temp.start()
                         openThreads.append(temp)
                         i += 1
-
-            # # press the "x" numpad with vgamepad
-            # gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
-            # gamepad.update()
-            # time.sleep(0.05)
-            # gamepad.release_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
-            # gamepad.update()
-
-            # Break the loop if 'q' key is pressed
             if cv2.waitKey(20) == ord("q"):
                 print("Exited with q")
                 break
