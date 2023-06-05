@@ -6,7 +6,7 @@ import numpy as np
 import os
 
 # read all the file names from the recordings folder
-recordings = os.listdir('recordings')
+recordings = os.listdir('modifiedRecordings')
 
 
 # for i in recordings[1:]:
@@ -61,4 +61,3 @@ for i in range(len(recordings)):
 
 # Print the model summary
 model.summary()
-

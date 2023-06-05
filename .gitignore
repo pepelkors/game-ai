@@ -1,5 +1,7 @@
 # ignore the venv file
 venv
+env
+
 # ignore the get-pip.py file
 get-pip.py
 # ignore vscode 
