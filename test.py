@@ -1,81 +1,92 @@
-
-import cv2
-import mss
+import os
 import numpy as np
-import pygetwindow as gw
-import pyautogui as ui
-import win32gui
-import vgamepad as vg
 
+recordings = os.listdir('recordings')
 
-# Find the Project Heartbeat window by its title
-hb_window = gw.getWindowsWithTitle("Project Heartbeat (DEBUG)")[0]
-win32gui.SetForegroundWindow(hb_window._hWnd)
-# Activate the Project Heartbeat window
-hb_window.activate()
-#hb_window.size = (960, 540)
+# create a 2d list for each input, there are 11 inputs
+input1 = [[], []]
+input2 = [[], []]
+input3 = [[], []]
+input4 = [[], []]
+input5 = [[], []]
+input6 = [[], []]
+input7 = [[], []]
+input8 = [[], []]
+input9 = [[], []]
+input10 = [[], []]
+input11 = [[], []]
+noInput = [[], []]
 
+# now to iterate through the recording
+for i in recordings:
+    # we need to read the recording
+    raw = np.load(f'recordings/{i}')
+    edges = raw['edges']
+    inputs = raw['inputs']
+    # now to iterate through the inputs
+    for j in range(len(inputs)):
+        # we need to see which input is active and therefore which ones to append to
+        # there has got to be a better way but i cant find it
+        if np.sum(inputs[j]) == 0:
+            noInput[0].append(edges[j])
+        else:
+            if inputs[j][0] == 1:
+                input1[0].append(edges[j])
+                input1[1].append(inputs[j])
+            if inputs[j][1] == 1:
+                input2[0].append(edges[j])
+                input2[1].append(inputs[j])
+            if inputs[j][2] == 1:
+                input3[0].append(edges[j])
+                input3[1].append(inputs[j])
+            if inputs[j][3] == 1:
+                input4[0].append(edges[j])
+                input4[1].append(inputs[j])
+            if inputs[j][4] == 1:
+                input5[0].append(edges[j])
+                input5[1].append(inputs[j])
+            if inputs[j][5] == 1:
+                input6[0].append(edges[j])
+                input6[1].append(inputs[j])
+            if inputs[j][6] == 1:
+                input7[0].append(edges[j])
+                input7[1].append(inputs[j])
+            if inputs[j][7] == 1:
+                input8[0].append(edges[j])
+                input8[1].append(inputs[j])
+            if inputs[j][8] == 1:
+                input9[0].append(edges[j])
+                input9[1].append(inputs[j])
+            if inputs[j][9] == 1:
+                input10[0].append(edges[j])
+                input10[1].append(inputs[j])
+            if inputs[j][10] == 1:
+                input11[0].append(edges[j])
+                input11[1].append(inputs[j])
+# now to save the modified recordings
+np.savez_compressed(f'modifiedRecordings/input1',
+                    edges=input1[0], inputs=input1[1])
+np.savez_compressed(f'modifiedRecordings/input2',
+                    edges=input2[0], inputs=input2[1])
+np.savez_compressed(f'modifiedRecordings/input3',
+                    edges=input3[0], inputs=input3[1])
+np.savez_compressed(f'modifiedRecordings/input4',
+                    edges=input4[0], inputs=input4[1])
+np.savez_compressed(f'modifiedRecordings/input5',
+                    edges=input5[0], inputs=input5[1])
+np.savez_compressed(f'modifiedRecordings/input6',
+                    edges=input6[0], inputs=input6[1])
+np.savez_compressed(f'modifiedRecordings/input7',
+                    edges=input7[0], inputs=input7[1])
+np.savez_compressed(f'modifiedRecordings/input8',
+                    edges=input8[0], inputs=input8[1])
+np.savez_compressed(f'modifiedRecordings/input9',
+                    edges=input9[0], inputs=input9[1])
+np.savez_compressed(f'modifiedRecordings/input10',
+                    edges=input10[0], inputs=input10[1])
+np.savez_compressed(f'modifiedRecordings/input11',
+                    edges=input11[0], inputs=input11[1])
+np.savez_compressed(f'modifiedRecordings/noInput',
+                    edges=noInput[0], inputs=noInput[1])
 
-gamepad = vg.VX360Gamepad()
-
-# Move the Project Heartbeat window to the front
-# ? not needed because sets foreground
-# hb_window.maximize()
-
-# Get the position and size of the Project Heartbeat window
-left, top, width, height = hb_window.left, hb_window.top, hb_window.width, hb_window.height
-
-# Print the window position and size
-print("Window Position:", left, top)
-print("Window Size:", width, height)
-
-game_window = {"top": top, "left": left, "width": width, "height": height}
-
-def processFrame(frame):
-    # change size to 960 x 540
-    frame = cv2.resize(frame, (960, 540))
-
-    return frame
-
-def accuracyMeter(frame):
-    # accuracy meter is 1/3 of the screen in the center, but only the bottom 1/15th of the screen
-    accuracyImage = frame[928:929,180:360]
-    # processing to only have white pixels exist in the image
-    
-    
-    
-    # create an image with only white pixels
-    #whitePixels = np.where(accuracyImage == 255)
-    return accuracyImage
-
-def main():
-    with mss.mss() as sct:
-        while True:
-            #if on start determine zero
-            
-            
-            # Capture the game window
-            screenshot = sct.grab(game_window)
-
-            # print("Capture screenshot")
-
-            # Convert the screenshot to a NumPy array
-            img = np.array(screenshot)
-            img = processFrame(img)
-            # Process the frame
-            whitePixel = accuracyMeter(img)
-
-            cv2.imshow("Game Window", img)
-
-  
-
-            # Break the loop if 'q' key is pressed
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                print("Exited with q")
-                break
-
-
-main()
-
-# release all windows
-cv2.destroyAllWindows()
+print('Done')

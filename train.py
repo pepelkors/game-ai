@@ -43,7 +43,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 for i in range(len(recordings)):
-    raw = np.load(f'recordings/{recordings[i]}')
+    raw = np.load(f'modifiedRecordings/{recordings[i]}')
     frames = raw['edges']
     inp = raw['inputs']
 
