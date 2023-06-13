@@ -31,10 +31,6 @@ model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 # Flatten the output of the convolutional layers
 model.add(layers.Flatten())
 
-# Add LSTM layers
-model.add(layers.Reshape((256, 240)))  # Reshape to match LSTM input shape
-model.add(layers.LSTM(64, return_sequences=True))
-model.add(layers.LSTM(64))
 
 model.add(layers.Dense(11, activation='sigmoid'))
 
