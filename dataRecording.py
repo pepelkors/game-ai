@@ -44,21 +44,22 @@ def main():
             # Convert the screenshot to a NumPy array
             img = np.array(screenshot)
             # shrink frame to 540 * 960 - 16*38
-            img = cv2.resize(img, (256, 144))
+            img = cv2.resize(img, (640, 360))
             # Process the frame
 
             edges, meanValue = edgeFrame(img)
             accuracyMeter = accuracyFrame(img)
             scoreMeter = scoreFrame(img)
-            cv2.imshow("Game Window", edges)
-            cv2.imshow("accuracyMeter Window", accuracyMeter)
-            cv2.imshow("scoreMeter Window", scoreMeter)
+            
+            #cv2.imshow("Game Window", edges)
+            #cv2.imshow("accuracyMeter Window", accuracyMeter)
+            #cv2.imshow("scoreMeter Window", scoreMeter)
 
             if (recording):
                 # Display the game window
                 inputs = xboxController.read()
                 inputArr.append(inputs)
-                ss.append(edges)
+                ss.append(img)
 
             if (xboxController.dump()):
                 if (not recording):
@@ -77,7 +78,7 @@ def main():
                         temp.start()
                         openThreads.append(temp)
                         i += 1
-            if cv2.waitKey(20) == ord("q"):
+            if cv2.waitKey(50) == ord("q"):
                 print("Exited with q")
                 break
 
